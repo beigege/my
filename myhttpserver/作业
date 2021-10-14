@@ -1,0 +1,17 @@
+• 构建本地镜像
+• 编写 Dockerfile 将练习 2.2 编写的 httpserver 容器化
+• 请思考有哪些最佳实践可以引入到 Dockerfile 中来
+• 将镜像推送至 docker 官方镜像仓库
+
+答：以上见dockerfile 、Makefile
+-----
+• 通过 docker 命令本地启动 httpserver
+答：
+本地环境执行：docker run -it -p 8888:3001  beigegede/golang-master:myhttpserverv1.0
+访问：curl http://192.168.57.3:8888/noparam?id=1
+----
+• 通过 nsenter 进入容器查看 IP 配置
+答：
+docker ps—— 找到CONTAINER ID：8951c4dd04d0
+docker inspect 8951c4dd04d0——找容器的pid
+sudo nsenter -t 4009 -n ip a——看容器的IP配置
