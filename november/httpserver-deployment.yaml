@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: httpserver-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: httpserver
+  template:
+    metadata:
+      labels:
+        app: httpserver
+    spec:
+      containers:
+        - name: httpserver
+          image: beigegede/golang-master:myhttpserverv1.0
+          ports:
+          - containerPort: 3001
+            protocol: TCP
+          resources:
+            limits:
+              memory: 256Mi
+              cpu: 1
+            requests:
+              memory: 256Mi
+              cpu: 100m
+          lifecycle:
+            postStart:
+              exec:
+                command: [ "/bin/sh", "-c", "echo Hello from the postStart handler > /usr/share/message" ]
+            preStop:
+              exec:
+                command: [ "/bin/sh","-c","ps -ef | grep httpserver | grep -v grep | awk '{print $2}' | xargs kill --no-run-if-empty" ]
+          livenessProbe:
+            exec:
+              command: [ "/bin/sh", "-c", "echo $(ps -ef | grep 192.168.57.3 | grep -v grep | awk '{print $2}' | head -n 1) >> /usr/share/message" ]
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          readinessProbe:
+            exec:
+              command: [ "/bin/sh", "-c", "echo $(ps -ef | grep 192.168.57.3 | grep -v grep | awk '{print $2}' | head -n 1) >> /usr/share/message" ]
+                #- cat
+                #- /tmp/healthy
+            initialDelaySeconds: 5
+            periodSeconds: 5
+      #会自动加的：qosClass: Burstable
